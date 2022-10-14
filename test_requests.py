@@ -5,11 +5,11 @@ def get_filter_map():
     url = "http://127.0.0.1:5000/perform_query"
 
     payload = {
-        "file_name": "apache_log.txt",
+        "file_name": "apache_logs.txt",
         "cmd1": "filter",
         "value1": "POST",
         "cmd2": "map",
-        "value2": "0"
+        "value2": "0",
     }
 
     response = requests.request(method="POST", url=url, data=payload)
@@ -24,7 +24,7 @@ def get_unique_map():
     payload = {
         'file_name': 'apache_logs.txt',
         'cmd1': 'map',
-        'value1': '1',
+        'value1': '5',
         'cmd2': 'unique',
         'value2': ''
     }

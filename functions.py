@@ -1,3 +1,6 @@
+from exceptions import RequestError
+
+
 def filter_query(param, data):
     return list(filter(lambda v: param in v, data))
 
@@ -5,8 +8,8 @@ def filter_query(param, data):
 def map_query(param, data):
     try:
         column_number = int(param)
-    except ValueError as error:
-        return error
+    except ValueError:
+        raise RequestError("Значение параметра map должно быть числом")
     return list(map(lambda v: v.split(' ')[column_number], data))
 
 
@@ -20,5 +23,8 @@ def sorted_query(param, data):
 
 
 def limit_query(param, data):
-    limit = int(param)
+    try:
+        limit = int(param)
+    except ValueError:
+        raise RequestError("Значение параметра limit должно быть числом")
     return list(data)[:limit]

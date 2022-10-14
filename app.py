@@ -17,7 +17,10 @@ def perform_query():
         return f"{error.message}", 400
     if not os.path.isfile(f'data/{req["file_name"]}'):
         return "Файл не найден", 400
-    result = build_query(req)
+    try:
+        result = build_query(req)
+    except RequestError as error:
+        return f"{error.message}", 400
     return app.response_class('\n'.join(result), content_type="text/plain")
 
 
