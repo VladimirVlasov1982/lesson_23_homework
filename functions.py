@@ -3,7 +3,10 @@ def filter_query(param, data):
 
 
 def map_query(param, data):
-    column_number = int(param)
+    try:
+        column_number = int(param)
+    except ValueError as error:
+        return error
     return list(map(lambda v: v.split(' ')[column_number], data))
 
 
@@ -14,6 +17,7 @@ def unique_query(data, *args, **kwargs):
 def sorted_query(param, data):
     reverse = True if param == 'desc' else False
     return sorted(data, reverse=reverse)
+
 
 def limit_query(param, data):
     limit = int(param)

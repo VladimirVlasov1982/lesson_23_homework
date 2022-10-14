@@ -1,4 +1,15 @@
+from typing import Generator
+
 import functions
+from exceptions import RequestError
+
+VALID_CMD_PARAMS = (
+    "filter",
+    "map",
+    "unique",
+    "sort",
+    "limit"
+)
 
 CMD_VALID_PARAM = {
     "filter": functions.filter_query,
@@ -9,23 +20,47 @@ CMD_VALID_PARAM = {
 }
 
 
-def file_reader(file_path):
+def validate_request(req: dict) -> dict:
+    cmd = {}
+    value = {}
+    try:
+        req.get('file_name')
+    except KeyError:
+        raise RequestError("Аттрибут file_name отсутствует")
+    if len(req) % 2 == 0:
+        raise RequestError("Неверный запрос, проверьте количество аргументов")
+    for key, val in req.items():
+        if "cmd" in key.lstrip() and req[key] in VALID_CMD_PARAMS:
+            cmd[key] = val
+        elif "value" in key.lstrip():
+            value[key] = val
+    if len(cmd) != len(value):
+        raise RequestError("Неверный запрос")
+    extra_keys = [item for item in set(req) if item not in set(cmd) and item not in value]
+    if len(extra_keys) > 1:
+        raise RequestError("Не корректные аргументы")
+    return req
+
+
+def upload_data(file_path: str) -> Generator:
     with open(file_path, "r", encoding="utf-8") as file:
         for line in file:
             yield line
 
 
+def prepare_request(req: dict) -> list:
+    cmd = sorted({key: val for key, val in req.items() if 'cmd' in key.lstrip()})
+    value = sorted({key: val for key, val in req.items() if 'value' in key.lstrip()})
+    cmd_value = list(zip(cmd, value))
+    return cmd_value
+
+
 def build_query(req):
-    data = file_reader(f"data/{req.get('file_name')}")
-    result = CMD_VALID_PARAM[req.get('cmd1')](param=req.get('value1'), data=data)
-    result = CMD_VALID_PARAM[req.get('cmd2')](param=req.get('value2'), data=result)
+    file_name = req.pop('file_name')
+    result = []
+    cmd_value = prepare_request(req)
+    data = upload_data(f"data/{file_name}")
+    for item in cmd_value:
+        result = CMD_VALID_PARAM[req[item[0]]](param=req[item[1]], data=data)
+        data = result
     return result
-
-
-query = {
-    "file_name": "apache_logs.txt",
-    "cmd1": "filter",
-    "value1": "POST",
-    "cmd2": "map",
-    "value2": "0"
-}
