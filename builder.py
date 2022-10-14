@@ -1,5 +1,4 @@
 from typing import Generator
-
 import functions
 from exceptions import RequestError
 
@@ -55,7 +54,7 @@ def prepare_request(req: dict) -> list:
     return cmd_value
 
 
-def build_query(req):
+def build_query(req: dict) -> list:
     file_name = req.pop('file_name')
     result = []
     cmd_value = prepare_request(req)

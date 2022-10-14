@@ -62,4 +62,3 @@ if __name__ == "__main__":
     get_filter_map()
     get_unique_map()
     get_all_parameters()
-

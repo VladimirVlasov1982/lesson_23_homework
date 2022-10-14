@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, abort
+from flask import Flask, request
 from builder import build_query, validate_request
 from exceptions import RequestError
 
@@ -21,7 +21,7 @@ def perform_query():
         result = build_query(req)
     except RequestError as error:
         return f"{error.message}", 400
-    return app.response_class('\n'.join(result), content_type="text/plain")
+    return app.response_class('\n'.join(result), content_type="text/plain"), 200
 
 
 if __name__ == "__main__":
